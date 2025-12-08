@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -18,37 +19,53 @@ import {
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 
-const formSchema = z.object({
-  Firstname: z.string().regex(/^[a-zA-Z_]+$/, {
-    message: "First name cannot contain special characters or numbers.",
-  }),
-  Lastname: z.string().regex(/^[a-zA-Z_]+$/, {
-    message: "Last name cannot contain special characters or numbers.",
-  }),
-  Username: z.string().min(4, {
-    message: "This username is already taken. Please choose another one.",
-  }),
-});
+const formSchema = z
+  .object({
+    Email: z.string().email({
+      message: "Please provide a valid email address.",
+    }),
+    phoneNumber: z
+      .string()
+      .regex(/^[0-9_]+$/, {
+        message: "Please enter a valid phone number.",
+      })
+      .min(8, {
+        message: "Phone number should atleast 8.",
+      }),
+    password: z
+      .string()
+      .min(8, "At least 8 characters")
+      .regex(/[A-Z]/, "Must contain one uppercase letter")
+      .regex(/[a-z]/, "Must contain one lowercase letter")
+      .regex(/[0-9]/, "Must contain one number")
+      .regex(/[^A-Za-z0-9]/, "Must contain one special character"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export default function ProfileForm() {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      Firstname: "",
-      Lastname: "",
-      Username: "",
+      Email: "",
+      phoneNumber: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-    router.push("/second");
+    router.push("/third");
   }
 
   return (
     <div className="w-screen h-screen flex justify-center items-center bg-gray-300 ">
-      <div className="w-[480px] h-[655px] bg-white rounded-xl p-8 flex flex-col gap-7">
+      <div className="w-[480px] min-h-[655px] bg-white rounded-xl p-8 flex flex-col gap-7 ">
         <div className="flex flex-col gap-2">
           <img src="logo.png" width="60" height="60" />
           <h1 className="text-[26px] font-semibold">Join Us! 😎</h1>
@@ -59,16 +76,16 @@ export default function ProfileForm() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="relative h-full"
+            className="relative h-full min-h-[416px] pb-20 "
           >
             <div className="space-y-4">
               <FormField
                 control={form.control}
-                name="Firstname"
+                name="Email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      First Name
+                      Email
                       <span className="text-[14px] text-[#E14942]">*</span>
                     </FormLabel>
                     <FormControl>
@@ -81,11 +98,11 @@ export default function ProfileForm() {
               />
               <FormField
                 control={form.control}
-                name="Lastname"
+                name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Last name
+                      Phone number
                       <span className="text-[14px] text-[#E14942]">*</span>
                     </FormLabel>
                     <FormControl>
@@ -98,11 +115,28 @@ export default function ProfileForm() {
               />
               <FormField
                 control={form.control}
-                name="Username"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Username
+                      Password
+                      <span className="text-[14px] text-[#E14942]">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Placeholder" {...field} />
+                    </FormControl>
+                    <FormDescription></FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Confirm Password
                       <span className="text-[14px] text-[#E14942]">*</span>
                     </FormLabel>
                     <FormControl>
@@ -114,12 +148,20 @@ export default function ProfileForm() {
                 )}
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full flex justify-center absolute bottom-2"
-            >
-              Conitnue 1/3 <ChevronRight />
-            </Button>
+            <div className="flex gap-2 w-full absolute bottom-2">
+              <Button
+                className="w-3/10 flex justify-center"
+                variant={"outline"}
+                onClick={() => {
+                  router.push("/");
+                }}
+              >
+                <ChevronLeft /> Back
+              </Button>
+              <Button type="submit" className="w-7/10 flex justify-center ">
+                Conitnue 2/3 <ChevronRight />
+              </Button>
+            </div>
           </form>
         </Form>
       </div>
