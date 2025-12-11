@@ -22,12 +22,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MdOutlineImage } from "react-icons/md";
 import { CiCalendar } from "react-icons/ci";
 import { Input } from "@/components/ui/input";
 import { ChildProps } from "../types";
 import { Header } from "./Header";
+import { StepContext } from "../page";
+import { profile } from "console";
 
 const formSchema = z.object({
   dateBirth: z.date().refine(
@@ -50,24 +52,45 @@ const formSchema = z.object({
     { message: "Image cannot be blank!!" }
   ),
 });
-
 export const Third = ({ setStep }: ChildProps) => {
+  const { data, setData } = useContext(StepContext);
+  // useEffect(() => {
+  //   const saved = localStorage.getItem("Third");
+
+  //   if (saved) {
+  //     const parsed = JSON.parse(saved);
+
+  //     if (parsed.dateBirth) {
+  //       parsed.dateBirth = new Date(parsed.dateBirth);
+  //     }
+
+  //     form.reset(parsed);
+  //     setPrev(parsed.profile);
+  //   }
+  // }, []);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      dateBirth: undefined,
-      profile: "",
+      dateBirth: data.dateBirth,
+      profile: data.profile,
     },
   });
+  const current = form.watch();
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     setStep(4);
-    localStorage.removeItem("First");
-    localStorage.removeItem("Second");
+    // localStorage.removeItem("First");
+    // localStorage.removeItem("Second");
+    // localStorage.removeItem("Third");
+    // setData((prev) => ({
+    //   ...prev,
+    //   dateBirth: values.dateBirth,
+    //   profile: values.profile,
+    // }));
   }
   const [open, setOpen] = useState<boolean>(false);
-  const [prev, setPrev] = useState<string>("");
+  const [prevs, setPrevs] = useState<string>(data.profile);
   return (
     <div className="w-[480px] h-[655px] bg-white rounded-xl p-8 flex flex-col gap-7">
       <Header />
@@ -94,7 +117,7 @@ export const Third = ({ setStep }: ChildProps) => {
                           id="date"
                           className="w-full justify-between font-normal"
                         >
-                          {field.value
+                          {!isNaN(field.value.getTime())
                             ? field.value.toLocaleDateString()
                             : "--/--/--"}
                           <CiCalendar />
@@ -134,17 +157,17 @@ export const Third = ({ setStep }: ChildProps) => {
                       className="border border-dashed bg-[#7F7F800D] flex flex-col items-center justify-center w-full h-[180px] relative gap-2"
                       {...field}
                     >
-                      {prev ? (
+                      {prevs ? (
                         <>
                           <img
-                            src={prev}
+                            src={prevs}
                             className="absolute w-full h-full object-cover"
                           />
                           <Button
                             type="button"
                             className="absolute top-2.5 right-2.5 rounded-full w-6 h-6 bg-black p-0 flex justify-center items-center"
                             onClick={() => {
-                              setPrev("");
+                              setPrevs("");
                             }}
                           >
                             <X className="text-white" />
@@ -167,8 +190,8 @@ export const Third = ({ setStep }: ChildProps) => {
                               field.onChange(() => {
                                 URL.createObjectURL(file);
                               });
-                              setPrev(URL.createObjectURL(file));
-                              console.log(prev);
+                              setPrevs(URL.createObjectURL(file));
+                              console.log(URL.createObjectURL(file));
                             }}
                             className="w-full h-full opacity-0 absolute"
                           />
@@ -188,6 +211,17 @@ export const Third = ({ setStep }: ChildProps) => {
               variant={"outline"}
               onClick={() => {
                 setStep(2);
+                console.log(current);
+                // localStorage.setItem(
+                //   "Third",
+                //   JSON.stringify({ ...current, profile: prev })
+                // );
+                setData((prev) => ({
+                  ...prev,
+                  dateBirth: current.dateBirth,
+                  profile: prevs,
+                }));
+                console.log(data);
               }}
             >
               <ChevronLeft /> Back

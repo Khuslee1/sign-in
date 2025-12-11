@@ -17,7 +17,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { ChildProps } from "../types";
 import { Header } from "./Header";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { StepContext } from "../page";
 
 const formSchema = z.object({
   Firstname: z.string().regex(/^[a-zA-Z_]+$/, {
@@ -32,26 +33,33 @@ const formSchema = z.object({
 });
 
 export const First = ({ setStep }: ChildProps) => {
+  const { data, setData } = useContext(StepContext);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      Firstname: "",
-      Lastname: "",
-      Username: "",
+      Firstname: data.Firstname,
+      Lastname: data.Lastname,
+      Username: data.Username,
     },
   });
-  useEffect(() => {
-    const saved = localStorage.getItem("First");
+  // useEffect(() => {
+  //   const saved = localStorage.getItem("First");
 
-    if (saved) {
-      form.reset(JSON.parse(saved));
-    }
-  }, []);
+  //   if (saved) {
+  //     form.reset(JSON.parse(saved));
+  //   }
+  // }, []);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     setStep(2);
-    localStorage.setItem("First", JSON.stringify(values));
+    // localStorage.setItem("First", JSON.stringify(values));
+    setData((prev) => ({
+      ...prev,
+      Firstname: values.Firstname,
+      Lastname: values.Lastname,
+      Username: values.Username,
+    }));
   }
 
   return (

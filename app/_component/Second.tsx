@@ -20,7 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { ChildProps } from "../types";
 import { Header } from "./Header";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { StepContext } from "../page";
 
 const formSchema = z
   .object({
@@ -50,28 +51,36 @@ const formSchema = z
   });
 
 export const Second = ({ setStep }: ChildProps) => {
+  const { data, setData } = useContext(StepContext);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      Email: "",
-      phoneNumber: "",
-      password: "",
-      confirmPassword: "",
+      Email: data.Email,
+      phoneNumber: data.phoneNumber,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
     },
   });
   const [see1, setSee1] = useState<boolean>(true);
   const [see2, setSee2] = useState<boolean>(true);
-  useEffect(() => {
-    const saved = localStorage.getItem("Second");
+  // useEffect(() => {
+  //   const saved = localStorage.getItem("Second");
 
-    if (saved) {
-      form.reset(JSON.parse(saved));
-    }
-  }, []);
+  //   if (saved) {
+  //     form.reset(JSON.parse(saved));
+  //   }
+  // }, []);
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     setStep(3);
-    localStorage.setItem("Second", JSON.stringify(values));
+    // localStorage.setItem("Second", JSON.stringify(values));
+    setData((prev) => ({
+      ...prev,
+      Email: values.Email,
+      phoneNumber: values.phoneNumber,
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+    }));
   }
 
   return (
