@@ -18,7 +18,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ChildProps } from "../types";
 import { Header } from "./Header";
 import { useContext, useEffect, useState } from "react";
 import { StepContext } from "../page";
@@ -50,8 +49,8 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-export const Second = ({ setStep }: ChildProps) => {
-  const { data, setData } = useContext(StepContext);
+export const Second = () => {
+  const { data, setData, setStep } = useContext(StepContext);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,17 +62,17 @@ export const Second = ({ setStep }: ChildProps) => {
   });
   const [see1, setSee1] = useState<boolean>(true);
   const [see2, setSee2] = useState<boolean>(true);
-  // useEffect(() => {
-  //   const saved = localStorage.getItem("Second");
+  useEffect(() => {
+    const saved = localStorage.getItem("Second");
 
-  //   if (saved) {
-  //     form.reset(JSON.parse(saved));
-  //   }
-  // }, []);
+    if (saved) {
+      form.reset(JSON.parse(saved));
+    }
+  }, []);
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     setStep(3);
-    // localStorage.setItem("Second", JSON.stringify(values));
+    localStorage.setItem("Second", JSON.stringify(values));
     setData((prev) => ({
       ...prev,
       Email: values.Email,
@@ -138,16 +137,21 @@ export const Second = ({ setStep }: ChildProps) => {
                       <Input
                         type={see1 ? "password" : "text"}
                         placeholder="Placeholder"
+                        className={`${see1 ? "text-blue-600" : "text-red-600"}`}
                         {...field}
                       />
                       <Button
                         type="button"
-                        className="absolute w-6 h-6 rounded-full p-0 right-1.5 top-1.5 flex justify-center items-center"
+                        className="absolute w-6 h-6 rounded-full p-0 right-1.5 top-1.5 flex justify-center items-center bg-white hover:bg-white"
                         onClick={() => {
                           setSee1(!see1);
                         }}
                       >
-                        {see1 ? <Eye /> : <EyeOff />}
+                        {see1 ? (
+                          <Eye className="text-yellow-400" />
+                        ) : (
+                          <EyeOff className="text-yellow-400" />
+                        )}
                       </Button>
                     </div>
                   </FormControl>
@@ -168,17 +172,22 @@ export const Second = ({ setStep }: ChildProps) => {
                     <div className="relative">
                       <Input
                         type={see2 ? "password" : "text"}
+                        className={`${see2 ? "text-blue-600" : "text-red-600"}`}
                         placeholder="Placeholder"
                         {...field}
                       />
                       <Button
                         type="button"
-                        className="absolute w-6 h-6 rounded-full p-0 right-1.5 top-1.5 flex justify-center items-center"
+                        className="absolute w-6 h-6 rounded-full p-0 right-1.5 top-1.5 flex justify-center items-center  bg-white hover:bg-white"
                         onClick={() => {
                           setSee2(!see2);
                         }}
                       >
-                        {see2 ? <Eye /> : <EyeOff />}
+                        {see2 ? (
+                          <Eye className="text-yellow-400" />
+                        ) : (
+                          <EyeOff className="text-yellow-400" />
+                        )}
                       </Button>
                     </div>
                   </FormControl>

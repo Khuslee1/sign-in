@@ -15,25 +15,52 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ChildProps } from "../types";
 import { Header } from "./Header";
 import { useContext, useEffect } from "react";
 import { StepContext } from "../page";
 
-const formSchema = z.object({
-  Firstname: z.string().regex(/^[a-zA-Z_]+$/, {
-    message: "First name cannot contain special characters or numbers.",
-  }),
-  Lastname: z.string().regex(/^[a-zA-Z_]+$/, {
-    message: "Last name cannot contain special characters or numbers.",
-  }),
-  Username: z.string().min(4, {
-    message: "This username is already taken. Please choose another one.",
-  }),
-});
+const formSchema = z
+  .object({
+    Firstname: z
+      .string()
+      .regex(/^[a-zA-Z_]+$/, {
+        message: "First name cannot contain special characters or numbers.",
+      })
+      .min(3, "that's disappointing, too short")
+      .max(12, "TOO loong, change your name")
+      .refine((ele) => ele !== "Oyunpurev", {
+        message: "Ta heterhii tom tolgoitoi bn",
+      }),
+    Lastname: z
+      .string()
+      .regex(/^[a-zA-Z_]+$/, {
+        message: "Last name cannot contain special characters or numbers.",
+      })
+      .min(3, "that's disappointing, too short")
+      .max(20, "TOO loong, change your name")
+      .refine((ele) => ele !== "noticegamer", {
+        message: "eeldee bisd",
+      }),
+    Username: z
+      .string()
+      .min(4, {
+        message: "that's disappointing, too short",
+      })
+      .max(20, "TOO loong, change your name")
+      .refine((ele) => ele !== "yargachin123", {
+        message: "Cringe al",
+      }),
+  })
+  .refine(
+    (ele) => ele.Firstname !== ele.Username && ele.Lastname !== ele.Username,
+    {
+      message: "This username is already taken. Please choose another one.",
+      path: ["Username"],
+    }
+  );
 
-export const First = ({ setStep }: ChildProps) => {
-  const { data, setData } = useContext(StepContext);
+export const First = () => {
+  const { data, setData, setStep } = useContext(StepContext);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,24 +69,25 @@ export const First = ({ setStep }: ChildProps) => {
       Username: data.Username,
     },
   });
-  // useEffect(() => {
-  //   const saved = localStorage.getItem("First");
+  useEffect(() => {
+    const saved = localStorage.getItem("First");
 
-  //   if (saved) {
-  //     form.reset(JSON.parse(saved));
-  //   }
-  // }, []);
+    if (saved) {
+      form.reset(JSON.parse(saved));
+    }
+  }, []);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     setStep(2);
-    // localStorage.setItem("First", JSON.stringify(values));
+    localStorage.setItem("First", JSON.stringify(values));
     setData((prev) => ({
       ...prev,
       Firstname: values.Firstname,
       Lastname: values.Lastname,
       Username: values.Username,
     }));
+    // window.alert("amjilttai hadgallaa!!!");
   }
 
   return (

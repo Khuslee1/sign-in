@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export type StepContextType = {
   data: dataType;
   setData: Dispatch<SetStateAction<dataType>>;
+  setStep: Dispatch<SetStateAction<number>>;
 };
 
 export const StepContext = createContext<StepContextType>(
@@ -34,6 +35,7 @@ export type dataType = {
 
 export default function ProfileForm() {
   const [step, setStep] = useState<number>(1);
+  // const dataLocal3 = JSON.parse(localStorage.getItem("Third") ?? "{}");
   const [data, setData] = useState<dataType>({
     Firstname: "",
     Lastname: "",
@@ -59,8 +61,9 @@ export default function ProfileForm() {
     localStorage.setItem("step", String(step));
   }, [step]);
   return (
-    <div className="w-screen h-screen flex justify-center items-center bg-gray-300 ">
-      <StepContext.Provider value={{ data, setData }}>
+    <div className="w-screen h-screen flex justify-center items-center bg-gray-300 relative z-0">
+      {/* <img src="flag.png" className="absolute w-full h-full -z-1" /> */}
+      <StepContext.Provider value={{ data, setData, setStep }}>
         <AnimatePresence mode="wait">
           {step == 1 ? (
             <motion.div
@@ -71,7 +74,7 @@ export default function ProfileForm() {
               exit="exit"
               transition={{ duration: 0.5 }}
             >
-              <First setStep={setStep} />
+              <First />
             </motion.div>
           ) : step == 2 ? (
             <motion.div
@@ -82,7 +85,7 @@ export default function ProfileForm() {
               exit="exit"
               transition={{ duration: 0.5 }}
             >
-              <Second setStep={setStep} />
+              <Second />
             </motion.div>
           ) : step == 3 ? (
             <motion.div
@@ -93,7 +96,7 @@ export default function ProfileForm() {
               exit="exit"
               transition={{ duration: 0.5 }}
             >
-              <Third setStep={setStep} />
+              <Third />
             </motion.div>
           ) : (
             <motion.div

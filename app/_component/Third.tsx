@@ -26,7 +26,6 @@ import { useContext, useEffect, useState } from "react";
 import { MdOutlineImage } from "react-icons/md";
 import { CiCalendar } from "react-icons/ci";
 import { Input } from "@/components/ui/input";
-import { ChildProps } from "../types";
 import { Header } from "./Header";
 import { StepContext } from "../page";
 import { profile } from "console";
@@ -52,22 +51,22 @@ const formSchema = z.object({
     { message: "Image cannot be blank!!" }
   ),
 });
-export const Third = ({ setStep }: ChildProps) => {
-  const { data, setData } = useContext(StepContext);
-  // useEffect(() => {
-  //   const saved = localStorage.getItem("Third");
+export const Third = () => {
+  const { data, setData, setStep } = useContext(StepContext);
+  useEffect(() => {
+    const saved = localStorage.getItem("Third");
 
-  //   if (saved) {
-  //     const parsed = JSON.parse(saved);
+    if (saved) {
+      const parsed = JSON.parse(saved);
 
-  //     if (parsed.dateBirth) {
-  //       parsed.dateBirth = new Date(parsed.dateBirth);
-  //     }
+      if (parsed.dateBirth) {
+        parsed.dateBirth = new Date(parsed.dateBirth);
+      }
 
-  //     form.reset(parsed);
-  //     setPrev(parsed.profile);
-  //   }
-  // }, []);
+      form.reset(parsed);
+      setPrevs(parsed.profile);
+    }
+  }, []);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -80,14 +79,14 @@ export const Third = ({ setStep }: ChildProps) => {
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     setStep(4);
-    // localStorage.removeItem("First");
-    // localStorage.removeItem("Second");
-    // localStorage.removeItem("Third");
-    // setData((prev) => ({
-    //   ...prev,
-    //   dateBirth: values.dateBirth,
-    //   profile: values.profile,
-    // }));
+    localStorage.removeItem("First");
+    localStorage.removeItem("Second");
+    localStorage.removeItem("Third");
+    setData((prev) => ({
+      ...prev,
+      dateBirth: values.dateBirth,
+      profile: values.profile,
+    }));
   }
   const [open, setOpen] = useState<boolean>(false);
   const [prevs, setPrevs] = useState<string>(data.profile);
@@ -117,7 +116,7 @@ export const Third = ({ setStep }: ChildProps) => {
                           id="date"
                           className="w-full justify-between font-normal"
                         >
-                          {!isNaN(field.value.getTime())
+                          {!isNaN(field.value?.getTime())
                             ? field.value.toLocaleDateString()
                             : "--/--/--"}
                           <CiCalendar />
@@ -212,10 +211,10 @@ export const Third = ({ setStep }: ChildProps) => {
               onClick={() => {
                 setStep(2);
                 console.log(current);
-                // localStorage.setItem(
-                //   "Third",
-                //   JSON.stringify({ ...current, profile: prev })
-                // );
+                localStorage.setItem(
+                  "Third",
+                  JSON.stringify({ ...current, profile: prevs })
+                );
                 setData((prev) => ({
                   ...prev,
                   dateBirth: current.dateBirth,
