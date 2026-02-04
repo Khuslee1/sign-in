@@ -19,7 +19,7 @@ export type StepContextType = {
 };
 
 export const StepContext = createContext<StepContextType>(
-  {} as StepContextType
+  {} as StepContextType,
 );
 export type dataType = {
   Firstname: string;
@@ -57,6 +57,7 @@ export default function ProfileForm() {
     if (localStorage.getItem("step") !== "4")
       return setStep(Number(localStorage.getItem("step")));
   }, []);
+
   useEffect(() => {
     localStorage.setItem("step", String(step));
   }, [step]);
@@ -65,7 +66,7 @@ export default function ProfileForm() {
       {/* <img src="flag.png" className="absolute w-full h-full -z-1" /> */}
       <StepContext.Provider value={{ data, setData, setStep }}>
         <AnimatePresence mode="wait">
-          {step == 1 ? (
+          {step == 1 || step == 0 ? (
             <motion.div
               key="1"
               variants={variants}
